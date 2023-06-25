@@ -1,0 +1,86 @@
+To create a website that shows the current weather in Stockholm, we will use Python with the Flask web framework and the OpenWeatherMap API to fetch the weather data. We will also use the requests library to make API calls.
+
+First, let's create the necessary files and their purposes:
+
+1. app.py: The main entry point of the Flask application.
+2. templates/index.html: The HTML template for the homepage.
+3. requirements.txt: The list of Python dependencies for the project.
+4. .env: A file to store sensitive information like API keys (not to be committed to version control).
+
+Now, let's create the content of each file:
+
+app.py
+```python
+from flask import Flask, render_template
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+app = Flask(__name__)
+
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
+BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+
+@app.route("/")
+def index():
+    """Fetches the current weather in Stockholm and renders it on the homepage."""
+    params = {
+        "q": "Stockholm",
+        "appid": API_KEY,
+        "units": "metric"
+    }
+    response = requests.get(BASE_URL, params=params)
+    weather_data = response.json()
+    current_temp = weather_data["main"]["temp"]
+
+    return render_template("index.html", current_temp=current_temp)
+
+if __name__ == "__main__":
+    app.run(port=8000)
+```
+
+templates/index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stockholm Weather</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    {{ current_temp }}°C
+</body>
+</html>
+```
+
+requirements.txt
+```plaintext
+Flask==2.1.1
+requests==2.26.0
+python-dotenv==0.19.2
+```
+
+.env
+```plaintext
+OPENWEATHER_API_KEY=your_api_key_here
+```
+
+Replace `your_api_key_here` with your actual OpenWeatherMap API key.
+
+To run the project, follow these steps:
+
+1. Install the required dependencies using `pip install -r requirements.txt`.
+2. Run the Flask application using `python app.py`.
+3. Visit `http://localhost:8000` in your web browser to see the current weather in Stockholm.
